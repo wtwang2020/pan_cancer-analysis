@@ -1,0 +1,40 @@
+setwd("D:/课本/与同学的合作项目/董子凯/正确数据泛癌/正常与异常组织")
+options(BioC_mirror="https://mirrors.tuna.tsinghua.edu.cn/bioconductor")
+if(!require("BiocManager")) install.packages("BiocManager")
+if(!require("TCGAbiolinks")) BiocManager::install("TCGAbiolinks")
+if(!require("SummarizedExperiment")) BiocManager::install("SummarizedExperiment")
+if(!require("DESeq2")) BiocManager::install("DESeq2")
+if(!require("edgeR")) BiocManager::install("edgeR")
+if(!require("limma")) BiocManager::install("limma")
+if(!require("survival")) install.packages("survival")
+if(!require("broom")) install.packages("broom")
+if(!require("devtools")) install.packages("devtools")
+if(!require("cli")) install.packages("cli")
+if(!require("reshape2")) install.packages("reshape2")
+if(!require("data.table")) install.packages("data.table")
+if(!require("ggplot2")) install.packages("ggplot2")
+if(!require("ggpubr")) install.packages("ggpubr")
+devtools::install_github("ayueme/easyTCGA",force = TRUE)
+library(easyTCGA)
+library(readr)
+library(data.table)
+#gz,无文件格式
+tcga_expr_file <- "tcga_RSEM_gene_fpkm.gz"
+tcga_clin_file <- "Survival_SupplementalTable_S1_20171025_xena_sp.gz"
+gtex_expr_file <- "gtex_RSEM_gene_fpkm.gz"
+gtex_pheno_file <- "GTEX_phenotype.gz"
+#除了会得到以上的8个rdata文件外，还会得到另外2个整合好的TCGA+GTEx数据：
+#
+#TCGA_GTEx_pancancer_lncRNA_pheno.rdata：TCGA和GTEx整合到一起的lncRNA表达矩阵和样本信息，注意：行是样本！前4列是样本信息，后面的列是lncRNA
+#TCGA_GTEx_pancancer_mRNA_pheno.rdata：TCGA和GTEx整合到一起的mRNA表达矩阵和样本信息，注意：行是样本！前4列是样本信息，后面的列是mRNA
+file_content <- read_file("gtex_RSEM_gene_fpkm.gz")
+getpancancer_xena(tcga_expr_file = tcga_expr_file,
+                  tcga_clin_file = tcga_clin_file,
+                  gtex_expr_file = gtex_expr_file,
+                  gtex_pheno_file = gtex_pheno_file,
+                  type = "tcga+gtex")
+data <- fread(gtex_expr_file)
+getpancancer_xena(
+                  gtex_expr_file = gtex_expr_file,
+                  gtex_pheno_file = gtex_pheno_file,
+                  type = "gtex")
