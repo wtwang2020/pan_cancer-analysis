@@ -1,7 +1,7 @@
-# ����RDATA�ļ�
-########################################���÷ֿ������������·������������#############################
-setwd("D:/�α�/��ͬѧ�ĺ�����Ŀ/���ӿ�/�޵��ȹ̷�������/ԭʼ���ݴ洢/count����/����")
-#load("D:/�α�/��ͬѧ�ĺ�����Ŀ/���ӿ�/�޵��ȹ̷�������/ԭʼ���ݴ洢/count����/TCGA_GTEx_pancancer_mrna_pheno.rdata")
+# 加载RDATA文件
+########################################设置分开代码里的数据路径和数据名称#############################
+setwd("D:/课本/与同学的合作项目/董子凯/无敌稳固泛癌分析/原始数据存储/count数据/配体")
+#load("D:/课本/与同学的合作项目/董子凯/无敌稳固泛癌分析/原始数据存储/count数据/TCGA_GTEx_pancancer_mrna_pheno.rdata")
 
 tumor_lable <- c("ACC","BLCA","BRCA","CESC","COAD","DLBC","ESCA","GBM","KICH","KIRC","KIRP","LAML","LGG","LIHC","LUAD","LUSC","OV","PAAD","PRAD","READ","SKCM","STAD",
                  "TGCT","THCA","THYM","UCEC","UCS")
@@ -14,12 +14,13 @@ pvalue_t = 0.05
 for (i in 1:length(tumor_lable)) {
   if (i != 4) { 
 suffix <- tumor_lable[i]
-load(paste(suffix, "����.RDATA", sep = ""))
+load(paste(suffix, "配体.RDATA", sep = ""))
 gene_expression <- get(paste("gene_expression", suffix, sep = ""))
 sample_info <- get(paste("sample_info", suffix, sep = ""))
-############################��������###############################
+############################函数加载###############################
+##matrix，纵名为样本名，横名为基因名，sample，第一列为样本名，第二列为肿瘤与正常，格式为数据框
 perform_limma_analysis <- function(data_matrixs, sample_info) {
-  # ����Ԥ����
+  # 数据预处理
   group <- sample_info[, 2]
   group <- factor(group,
                   levels = c("TCGA_tumor","GTEx_normal"))
@@ -27,10 +28,10 @@ perform_limma_analysis <- function(data_matrixs, sample_info) {
   dge <- DGEList(counts=data_matrixs)
   dge <- calcNormFactors(dge)
   design <- model.matrix(~group)
-  v <- voom(dge,design, normalize="quantile")   #limma����RNA-SEQ�Ļ�ҪVOOM��׼��
+  v <- voom(dge,design, normalize="quantile")   #limma包对RNA-SEQ的话要VOOM标准化
   fit <- lmFit(v, design)
   fit= eBayes(fit)
-  DEG3 = topTable(fit, coef=2, n=Inf)     #ֱ����ȡ ����as.data.frame
+  DEG3 = topTable(fit, coef=2, n=Inf)     #直接提取 不用as.data.frame
   DEG3 = na.omit(DEG3)
   
   k1 = (DEG3$P.Value < pvalue_t)&(DEG3$logFC < -logFC_t);table(k1)
@@ -41,7 +42,7 @@ perform_limma_analysis <- function(data_matrixs, sample_info) {
 
   return(DEG3)
 }
-#���ú���
+#调用函数
 #result <- perform_limma_analysis(data_matrixs, sample_info)
 #write.table(result, "limma_result.txt")
 #################################################################
@@ -52,5 +53,5 @@ row.names(data_matrixs)<- data_lables
 data_matrixs <- t(data_matrixs)
 print(suffix)
 result <- perform_limma_analysis(data_matrixs, sample_info)
-write.csv(result, paste(suffix, "����.csv", sep = ","))
+write.csv(result, paste(suffix, "配体.csv", sep = ","))
   }}
