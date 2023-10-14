@@ -1,8 +1,9 @@
-#!setwd("D:/�α�/��ͬѧ�ĺ�����Ŀ/���ӿ�/��ȷ���ݷ���/�������쳣��֯/�������������Ա�ͼƬ/�������/����")
+#####################错误的，函数在数据预处理哪里#########################################
+#!setwd("D:/课本/与同学的合作项目/董子凯/正确数据泛癌/正常与异常组织/正常肿瘤多基因对比图片/差异表达/测试")
 #!data<-read.table("GSE98793.txt")
 #!group_list<-read.table("gene_list.txt")
 perform_limma_analysis <- function(data_matrixs, sample_info) {
-  # ����Ԥ����
+  # 数据预处理
   group <- sample_info[, 2]
   suppressMessages(library(limma))
   design <- model.matrix(~0 + factor(group))
@@ -23,7 +24,7 @@ perform_limma_analysis <- function(data_matrixs, sample_info) {
   
   return(nrDEG)
 }
-#���ú���
+#调用函数
 result <- perform_limma_analysis(data_matrixs, sample_info)
 write.table(result, "limma_result.txt")
 
